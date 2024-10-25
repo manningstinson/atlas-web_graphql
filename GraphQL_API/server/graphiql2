@@ -1,0 +1,27 @@
+query {
+  task(id: "2") {
+    title
+    weight
+    description
+  }
+}
+
+# Query a task by ID
+{
+  task(id: 1) {
+    id
+    title
+    weight
+    description
+  }
+}
+
+# Query a project by ID
+{
+  project(id: 2) {
+    id
+    title
+    weight
+    description
+  }
+}
