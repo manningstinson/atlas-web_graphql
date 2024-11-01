@@ -5,15 +5,14 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-// MongoDB Atlas connection string
-mongoose.connect('mongodb+srv://atlas-fullstack:ZiBOgI1ni029vdyY@cluster0.20if9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-
-mongoose.connection.once('open', () => {
-    console.log('Connected to database');
-});
+// Replace with your MongoDB Atlas connection string
+mongoose.connect('mongodb+srv://atlas-fullstack: MYMrDv4ynAKajjl0@cluster0.20if9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+    .then(() => {
+        console.log('Connected to database');
+    })
+    .catch(err => {
+        console.error('Database connection error:', err);
+    });
 
 app.use('/graphql', graphqlHTTP({
     schema,
