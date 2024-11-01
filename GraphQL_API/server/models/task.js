@@ -1,26 +1,32 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Define the Task schema
+// Define the task schema
 const taskSchema = new Schema({
     title: {
         type: String,
-        required: true // Title is required
+        required: true
     },
     weight: {
         type: Number,
-        required: true // Weight is required (could indicate task importance)
+        required: true
     },
     description: {
         type: String,
-        required: true // Description is required
+        required: true
     },
     projectId: {
-        type: Schema.Types.ObjectId, // Reference to the Project model
-        ref: 'Project', // Establishes a relationship with the Project model
-        required: true // Ensures every task is linked to a project
+        type: Schema.Types.ObjectId,
+        ref: 'Project',
+        required: true
     }
+}, {
+    // Add timestamps for when documents are created and modified
+    timestamps: true
 });
 
-// Export the Task model
+// Add index for better query performance when searching by projectId
+taskSchema.index({ projectId: 1 });
+
+// Create and export the Task model
 module.exports = mongoose.model('Task', taskSchema);

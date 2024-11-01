@@ -1,6 +1,25 @@
 {
+  "name": "server",
+  "version": "1.0.0",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "nodemon server/app.js",
+    "dev": "nodemon server/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "mongodb": "^6.10.0",
-    "mongoose": "^8.8.0"
+    "@apollo/client": "^3.11.8",
+    "express": "^4.21.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.9.0",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

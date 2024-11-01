@@ -1,21 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Define the Project schema
+// Define the project schema
 const projectSchema = new Schema({
     title: {
         type: String,
-        required: true // Title is required
+        required: true
     },
     weight: {
         type: Number,
-        required: true // Weight is required (this could represent project size or importance)
+        required: true
     },
     description: {
         type: String,
-        required: true // Description is required
+        required: true
     }
+}, {
+    // Add timestamps for when documents are created and modified
+    timestamps: true
 });
 
-// Export the Project model
+// Create and export the Project model
 module.exports = mongoose.model('Project', projectSchema);

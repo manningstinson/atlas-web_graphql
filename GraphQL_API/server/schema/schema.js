@@ -1,79 +1,126 @@
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID, GraphQLList, GraphQLSchema } = require('graphql');
-const Task = require('../models/task'); // Correct path to task model
-const Project = require('../models/project'); // Correct path to project model
+const graphql = require('graphql');
+const Project = require('../models/project');
+const Task = require('../models/task');
 
-// Define TaskType with a project field linking to ProjectType
-const TaskType = new GraphQLObjectType({
-  name: 'Task',
-  fields: () => ({
-    id: { type: GraphQLID },
-    title: { type: GraphQLString },
-    weight: { type: GraphQLInt },
-    description: { type: GraphQLString },
-    project: {
-      type: ProjectType,
-      resolve(parent, args) {
-        return Project.findById(parent.projectId); // Using Mongoose to fetch project
-      },
-    },
-  }),
-});
+const {
+    GraphQLObjectType,
+    GraphQLString,
+    GraphQLSchema,
+    GraphQLID,
+    GraphQLFloat,
+    GraphQLList,
+    GraphQLNonNull
+} = graphql;
 
-// Define ProjectType with a tasks field linking to TaskType
+// Project Type Definition
 const ProjectType = new GraphQLObjectType({
-  name: 'Project',
-  fields: () => ({
-    id: { type: GraphQLID },
-    title: { type: GraphQLString },
-    weight: { type: GraphQLInt },
-    description: { type: GraphQLString },
-    tasks: {
-      type: new GraphQLList(TaskType),
-      resolve(parent, args) {
-        return Task.find({ projectId: parent.id }); // Using Mongoose to fetch tasks
-      },
-    },
-  }),
+    name: 'Project',
+    fields: () => ({
+        id: { type: GraphQLID },
+        title: { type: GraphQLString },
+        weight: { type: GraphQLFloat },
+        description: { type: GraphQLString },
+        tasks: {
+            type: new GraphQLList(TaskType),
+            resolve(parent, args) {
+                return Task.find({ projectId: parent.id });
+            }
+        }
+    })
 });
 
-// Define the RootQuery
+// Task Type Definition
+const TaskType = new GraphQLObjectType({
+    name: 'Task',
+    fields: () => ({
+        id: { type: GraphQLID },
+        title: { type: GraphQLString },
+        weight: { type: GraphQLFloat },
+        description: { type: GraphQLString },
+        project: {
+            type: ProjectType,
+            resolve(parent, args) {
+                return Project.findById(parent.projectId);
+            }
+        }
+    })
+});
+
+// Root Query
 const RootQuery = new GraphQLObjectType({
-  name: 'RootQueryType',
-  fields: {
-    task: {
-      type: TaskType,
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Task.findById(args.id); // Using Mongoose to find task by ID
-      },
-    },
-    project: {
-      type: ProjectType,
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Project.findById(args.id); // Using Mongoose to find project by ID
-      },
-    },
-    tasks: {
-      type: new GraphQLList(TaskType),
-      resolve(parent, args) {
-        return Task.find({}); // Fetch all tasks
-      },
-    },
-    projects: {
-      type: new GraphQLList(ProjectType),
-      resolve(parent, args) {
-        return Project.find({}); // Fetch all projects
-      },
-    },
-  },
+    name: 'RootQueryType',
+    fields: {
+        project: {
+            type: ProjectType,
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args) {
+                return Project.findById(args.id);
+            }
+        },
+        task: {
+            type: TaskType,
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args) {
+                return Task.findById(args.id);
+            }
+        },
+        projects: {
+            type: new GraphQLList(ProjectType),
+            resolve(parent, args) {
+                return Project.find({});
+            }
+        },
+        tasks: {
+            type: new GraphQLList(TaskType),
+            resolve(parent, args) {
+                return Task.find({});
+            }
+        }
+    }
 });
 
-// Define mutations if needed (optional)
-// ...
+// Mutations
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addProject: {
+            type: ProjectType,
+            args: {
+                title: { type: new GraphQLNonNull(GraphQLString) },
+                weight: { type: new GraphQLNonNull(GraphQLFloat) },
+                description: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve(parent, args) {
+                let project = new Project({
+                    title: args.title,
+                    weight: args.weight,
+                    description: args.description
+                });
+                return project.save();
+            }
+        },
+        addTask: {
+            type: TaskType,
+            args: {
+                title: { type: new GraphQLNonNull(GraphQLString) },
+                weight: { type: new GraphQLNonNull(GraphQLFloat) },
+                description: { type: new GraphQLNonNull(GraphQLString) },
+                projectId: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args) {
+                let task = new Task({
+                    title: args.title,
+                    weight: args.weight,
+                    description: args.description,
+                    projectId: args.projectId
+                });
+                return task.save();
+            }
+        }
+    }
+});
 
-// Create the GraphQL schema
 module.exports = new GraphQLSchema({
-  query: RootQuery,
-  // mutations: Mutation, // Uncomment if you have mutations
+    query: RootQuery,
+    mutation: Mutation
 });
